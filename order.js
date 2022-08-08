@@ -8,6 +8,8 @@ let index = 0
 app.get('/purchase/:id', async (req, res) => {
     try {
       const id = req.params.id;
+      index>= catalogServer.length -1? index =0: index+=1
+
       request(catalogServer[index] + '/info/' + id, { json: true }, (err, response, body) => {
         if (err) {
           return res.send(err)
@@ -44,4 +46,4 @@ app.get('/purchase/:id', async (req, res) => {
 })
 app.listen(port, () => {
     console.log("Order Server is Running!")
-  })
+  })g
