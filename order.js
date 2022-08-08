@@ -1,12 +1,14 @@
 const axios = require("axios")
+const express = require("express")
 const app = express()
 const request=require('request');
-const port = 3003
-const catalogServer = "http://192.168.1.167:5000"
+const port = 3004
+const catalogServer = ["http://192.168.1.167:5000","http://192.168.1.136:5001"]
+let index = 0
 app.get('/purchase/:id', async (req, res) => {
     try {
       const id = req.params.id;
-      request(catalogServer + '/info/' + id, { json: true }, (err, response, body) => {
+      request(catalogServer[index] + '/info/' + id, { json: true }, (err, response, body) => {
         if (err) {
           return res.send(err)
         }
@@ -17,8 +19,11 @@ app.get('/purchase/:id', async (req, res) => {
           return res.send({ message: 'out of stock' })
         }
         const bookName = body.title
-        request(
-          catalogServer+ '/book/' + id + '?stock=-1',
+         
+
+    
+      request(
+    catalogServer[index]   + '/book/' + id + '?stock=-1'+'&price=',
           { json: true, method: 'PUT' },
           (err, response2, body) => {
             if (response2.statusCode == 200) {
@@ -28,12 +33,15 @@ app.get('/purchase/:id', async (req, res) => {
             }
           }
         )
+        
       })
     } catch (err) {
       console.log(err)
+    }
+    finally{
+      index = (index + 1) % catalogServer.length
     }
 })
 app.listen(port, () => {
     console.log("Order Server is Running!")
   })
-
